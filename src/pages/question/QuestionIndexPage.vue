@@ -2,7 +2,7 @@
   <q-page class="">
     <div class="shadow-0 q-pa-md rounded-borders text-black bg-white q-pa-lg">
       <q-toolbar class="">
-        <q-toolbar-title class="text-h6 invisible">Clients</q-toolbar-title>
+        <q-toolbar-title class="text-h6 invisible">Questions</q-toolbar-title>
 
         <q-input bottom-slots label="Search User" outlined class="q-mr-sm">
           <template v-slot:append>

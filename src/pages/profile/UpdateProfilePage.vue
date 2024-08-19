@@ -1,81 +1,177 @@
 <template>
   <q-page class="">
-    <div class="shadow-0 q-pa-md rounded-borders text-black bg-white q-pa-lg">
+    <div
+      class="shadow-0 rounded-borders text-black bg-white"
+      :class="$q.screen.gt.sm ? 'q-pa-lg' : 'q-pa-sm'"
+    >
       <q-card class="full-width">
-        <q-toolbar class="bg-primary text-white">
+        <!-- <q-toolbar class="bg-primary text-white">
           <q-toolbar-title> Profile </q-toolbar-title>
-          <!-- <q-btn flat icon="close" round v-close-popup></q-btn> -->
-        </q-toolbar>
-        <q-card-section>
-          <q-form
-            class="column q-pa-md shawdow full-width block"
-            ref="formName"
-            @submit="onSubmit"
-          >
-            <div class="row q-col-gutter-none relative-position">
-              <div class="row col-4 q-col-gutter-none q-mr-md">
-                <div
-                  class="full-width center"
-                  style="
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    gap: 10px; /* Optional: Add space between the avatar and button */
-                  "
-                >
-                  <!-- <q-input
-                    filled
-                    label=" Name*"
-                    type="text"
-                    v-model="formData.name"
+        </q-toolbar> -->
+        <q-tabs
+          v-model="tab"
+          inline-label
+          indicator-color="primary"
+          align="left"
+          class="bg-grey-2 text-black shadow-2"
+          active-color="white"
+          active-bg-color="primary"
+          no-caps
+        >
+          <q-tab
+            name="profile"
+            label="Update Profile"
+            v-if="
+              userStore.userDetails.roles.some(
+                (permis) => ['client'].indexOf(permis) !== -1
+              )
+            "
+          />
+          <q-tab
+            name="profile"
+            label="Profile"
+            v-if="
+              userStore.userDetails.roles.some(
+                (permis) => ['professional'].indexOf(permis) !== -1
+              )
+            "
+          />
+          <q-separator vertical />
+          <q-tab
+            name="biography"
+            label="Biography"
+            @click="getBio"
+            v-if="
+              userStore.userDetails.roles.some(
+                (permis) => ['professional'].indexOf(permis) !== -1
+              )
+            "
+          />
+          <q-separator vertical />
+          <q-tab
+            name="experience"
+            label="Experience"
+            @click="getExperiences"
+            v-if="
+              userStore.userDetails.roles.some(
+                (permis) => ['professional'].indexOf(permis) !== -1
+              )
+            "
+          />
+          <q-separator vertical />
+          <q-tab
+            name="locations"
+            label="Locations"
+            v-if="
+              userStore.userDetails.roles.some(
+                (permis) => ['professional'].indexOf(permis) !== -1
+              )
+            "
+          />
+
+          <q-separator vertical />
+          <!-- <q-tab
+            name="hospital"
+            label="Hospitals"
+            v-if="
+              userStore.userDetails.roles.some(
+                (permis) => ['professional'].indexOf(permis) !== -1
+              )
+            "
+          />
+          <q-separator vertical /> -->
+          <q-tab
+            name="education"
+            label="Education"
+            v-if="
+              userStore.userDetails.roles.some(
+                (permis) => ['professional'].indexOf(permis) !== -1
+              )
+            "
+          />
+          <q-separator vertical />
+          <!-- <q-tab
+            name="language"
+            label="Language"
+            v-if="
+              userStore.userDetails.roles.some(
+                (permis) => ['professional'].indexOf(permis) !== -1
+              )
+            "
+          />
+          <q-separator vertical /> -->
+        </q-tabs>
+        <q-tab-panels v-model="tab" animated>
+          <q-tab-panel name="profile">
+            <q-card-section>
+              <q-form
+                class="column q-pa-md shawdow full-width block"
+                ref="formName"
+                @submit="onSubmit"
+              >
+                <div class="row q-col-gutter-none relative-position">
+                  <div
+                    :class="
+                      $q.screen.gt.md
+                        ? 'row col-4 q-col-gutter-none q-mr-md'
+                        : 'full-width'
+                    "
                   >
-                    <template v-slot:prepend>
-                      <q-icon name="account_circle" />
-                    </template>
-                  </q-input> -->
-                  <q-avatar size="200px" class="border">
-                    <img
-                      v-if="
-                        userStore.userDetails.user &&
-                        userStore.userDetails.user.profile_pic
+                    <div
+                      class="full-width center"
+                      style="
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        gap: 10px; /* Optional: Add space between the avatar and button */
                       "
-                      :src="userStore.userDetails.user.profile_pic"
-                    />
-                  </q-avatar>
-                  <q-btn
-                    unelevated
-                    label="Change"
-                    class="text-center"
-                    color="primary"
-                    size="md"
-                    @click="changeImageDialog(0)"
-                  />
-                </div>
-              </div>
-              <div class="row col q-col-gutter-none relative-position q-mr-md">
-                <q-input
-                  filled
-                  label="Name*"
-                  class="full-width q-mb-md"
-                  type="text"
-                  v-model="formData.name"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="account_circle" />
-                  </template>
-                </q-input>
-                <q-input
-                  filled
-                  v-model="formData.dob"
-                  mask="date"
-                  class="full-width q-mb-md"
-                  label="Birthday"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="event" class="cursor-pointer">
+                    >
+                      <q-avatar size="200px" class="border">
+                        <img
+                          v-if="
+                            userStore.userDetails.user &&
+                            userStore.userDetails.user.profile_pic
+                          "
+                          :src="userStore.userDetails.user.profile_pic"
+                        />
+                      </q-avatar>
+                      <q-btn
+                        unelevated
+                        label="Change"
+                        class="text-center q-mb-lg"
+                        color="primary"
+                        size="md"
+                        @click="changeImageDialog(0)"
+                      />
+                    </div>
+                  </div>
+                  <div
+                    :class="
+                      $q.screen.gt.sm
+                        ? 'row col q-col-gutter-none relative-position q-mr-md'
+                        : 'full-width'
+                    "
+                  >
+                    <q-input
+                      filled
+                      label="Name*"
+                      class="full-width q-mb-md"
+                      type="text"
+                      v-model="formData.name"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="account_circle" />
+                      </template>
+                    </q-input>
+                    <q-input
+                      filled
+                      v-model="formData.dob"
+                      mask="date"
+                      class="full-width q-mb-md"
+                      label="Birthday"
+                    >
                       <q-popup-proxy
-                        cover
                         transition-show="scale"
                         transition-hide="scale"
                       >
@@ -90,180 +186,271 @@
                           </div>
                         </q-date>
                       </q-popup-proxy>
-                    </q-icon>
-                  </template>
-                </q-input>
-                <q-select
-                  filled
-                  class="full-width q-mb-md"
-                  :options="['Male', 'Female']"
-                  label="Gender*"
-                  v-model="formData.gender"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="wc" />
-                  </template>
-                </q-select>
-                <q-input
-                  filled
-                  label="Phone #"
-                  type="text"
-                  class="full-width q-mb-md"
-                  v-model="formData.phone"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="local_phone" />
-                  </template>
-                </q-input>
-                <!-- <q-select
-                  filled
-                  class="full-width q-mb-md"
-                  :options="['client', 'professional']"
-                  label="Role*"
-                  v-model="formData.role"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="groups_3" />
-                  </template>
-                </q-select> -->
-                <q-select
-                  filled
-                  v-model="formData.country"
-                  use-input
-                  class="full-width q-mb-md"
-                  input-debounce="0"
-                  label="Select Country"
-                  :options="CountryOptions"
-                  @filter="CountryfilterFn"
-                  @update:model-value="getStateFunc"
-                  behavior="menu"
-                >
-                  <template v-slot:no-option>
-                    <q-item>
-                      <q-item-section class="text-grey">
-                        No results
-                      </q-item-section>
-                    </q-item>
-                  </template>
-                  <template v-slot:append>
-                    <q-icon
-                      v-if="formData.country !== null"
-                      class="cursor-pointer"
-                      name="clear"
-                      @click.stop.prevent="formData.country = null"
-                      @click="clearStateCityFunc"
+                      <template v-slot:prepend>
+                        <q-icon name="event" class="cursor-pointer"> </q-icon>
+                      </template>
+                    </q-input>
+                    <q-select
+                      filled
+                      class="full-width q-mb-md"
+                      :options="['Male', 'Female']"
+                      label="Gender*"
+                      v-model="formData.gender"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="wc" />
+                      </template>
+                    </q-select>
+                    <q-input
+                      filled
+                      label="Phone #"
+                      type="text"
+                      class="full-width q-mb-md"
+                      v-model="formData.phone"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="local_phone" />
+                      </template>
+                    </q-input>
+                    <q-select
+                      filled
+                      v-model="formData.country"
+                      use-input
+                      class="full-width q-mb-md"
+                      input-debounce="0"
+                      label="Select Country"
+                      :options="CountryOptions"
+                      @filter="CountryfilterFn"
+                      @update:model-value="getStateFunc"
+                      behavior="menu"
+                    >
+                      <template v-slot:no-option>
+                        <q-item>
+                          <q-item-section class="text-grey">
+                            No results
+                          </q-item-section>
+                        </q-item>
+                      </template>
+                      <template v-slot:append>
+                        <q-icon
+                          v-if="formData.country !== null"
+                          class="cursor-pointer"
+                          name="clear"
+                          @click.stop.prevent="formData.country = null"
+                          @click="clearStateCityFunc"
+                        />
+                      </template>
+                      <template v-slot:prepend>
+                        <q-icon name="language" />
+                      </template>
+                    </q-select>
+                    <q-select
+                      filled
+                      v-model="formData.state"
+                      use-input
+                      class="full-width q-mb-md"
+                      input-debounce="0"
+                      label="Select State"
+                      :options="stateOptions"
+                      @filter="StatefilterFn"
+                      @update:model-value="getCityFunc"
+                      behavior="menu"
+                    >
+                      <template v-slot:no-option>
+                        <q-item>
+                          <q-item-section class="text-grey">
+                            No results
+                          </q-item-section>
+                        </q-item>
+                      </template>
+                      <template v-slot:append>
+                        <q-icon
+                          v-if="formData.state !== null"
+                          class="cursor-pointer"
+                          name="clear"
+                          @click.stop.prevent="formData.state = null"
+                        />
+                      </template>
+                      <template v-slot:prepend>
+                        <q-icon name="emoji_transportation" />
+                      </template>
+                    </q-select>
+                    <q-select
+                      filled
+                      v-model="formData.city"
+                      use-input
+                      class="full-width q-mb-md"
+                      input-debounce="0"
+                      label="Select City"
+                      :options="cityOptions"
+                      @filter="CityfilterFn"
+                      behavior="menu"
+                    >
+                      <template v-slot:no-option>
+                        <q-item>
+                          <q-item-section class="text-grey">
+                            No results
+                          </q-item-section>
+                        </q-item>
+                      </template>
+                      <template v-slot:append>
+                        <q-icon
+                          v-if="formData.city !== null"
+                          class="cursor-pointer"
+                          name="clear"
+                          @click.stop.prevent="formData.city = null"
+                        />
+                      </template>
+                      <template v-slot:prepend>
+                        <q-icon name="location_city" />
+                      </template>
+                    </q-select>
+                    <q-input
+                      filled
+                      class="full-width q-mb-md"
+                      label="Street"
+                      type="text"
+                      v-model="formData.street"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="place" />
+                      </template>
+                    </q-input>
+                    <q-btn
+                      unelevated
+                      label="Update"
+                      class="text-center full-width"
+                      color="primary"
+                      size="md"
+                      type="submit"
                     />
-                  </template>
-                  <template v-slot:prepend>
-                    <q-icon name="language" />
-                  </template>
-                </q-select>
-                <q-select
-                  filled
-                  v-model="formData.state"
-                  use-input
-                  class="full-width q-mb-md"
-                  input-debounce="0"
-                  label="Select State"
-                  :options="stateOptions"
-                  @filter="StatefilterFn"
-                  @update:model-value="getCityFunc"
-                  behavior="menu"
-                >
-                  <template v-slot:no-option>
-                    <q-item>
-                      <q-item-section class="text-grey">
-                        No results
-                      </q-item-section>
-                    </q-item>
-                  </template>
-                  <template v-slot:append>
-                    <q-icon
-                      v-if="formData.state !== null"
-                      class="cursor-pointer"
-                      name="clear"
-                      @click.stop.prevent="formData.state = null"
+                  </div>
+                </div>
+              </q-form>
+            </q-card-section>
+          </q-tab-panel>
+
+          <!-- Biography -->
+          <q-tab-panel name="biography">
+            <q-card-section>
+              <q-form
+                class="column q-pa-md shawdow full-width block"
+                ref="formName"
+              >
+                <div class="row q-col-gutter-none relative-position">
+                  <div
+                    :class="
+                      $q.screen.gt.sm
+                        ? 'row col q-col-gutter-none relative-position q-mr-md'
+                        : 'full-width'
+                    "
+                  >
+                    <p>Biography</p>
+                    <q-input
+                      filled
+                      class="full-width q-mb-md"
+                      label="Biography should start with honorifics or courtesy titles
+                      follow by your name ex. Dr. Janlord Luga, DDS is a
+                      prosthodontics practitioner in Irving, TX...
+                    </p>"
+                      type="textarea"
+                      v-model="formData.bio"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="account_box" />
+                      </template>
+                    </q-input>
+                    <q-btn
+                      unelevated
+                      label="Save"
+                      class="text-center full-width"
+                      color="primary"
+                      size="md"
+                      type="button"
+                      @click="onSubmitBio"
                     />
-                  </template>
+                  </div>
+                </div>
+              </q-form>
+            </q-card-section>
+          </q-tab-panel>
+
+          <!-- Experience Panel -->
+          <q-tab-panel name="experience">
+            <q-card-section>
+              <q-form class="column q-pa-md shawdow full-width block">
+                <div v-for="(exp, index) in experiences" :key="index" class="q-mb-md">
+                  <q-input
+                    v-model="exp.jobTitle"
+                    label="Job Title"
+                    filled
+                    class="q-mb-sm"
+                  >
                   <template v-slot:prepend>
-                    <q-icon name="emoji_transportation" />
-                  </template>
-                </q-select>
-                <q-select
-                  filled
-                  v-model="formData.city"
-                  use-input
-                  class="full-width q-mb-md"
-                  input-debounce="0"
-                  label="Select City"
-                  :options="cityOptions"
-                  @filter="CityfilterFn"
-                  behavior="menu"
-                >
-                  <template v-slot:no-option>
-                    <q-item>
-                      <q-item-section class="text-grey">
-                        No results
-                      </q-item-section>
-                    </q-item>
-                  </template>
-                  <template v-slot:append>
-                    <q-icon
-                      v-if="formData.city !== null"
-                      class="cursor-pointer"
-                      name="clear"
-                      @click.stop.prevent="formData.city = null"
-                    />
-                  </template>
-                  <template v-slot:prepend>
-                    <q-icon name="location_city" />
-                  </template>
-                </q-select>
-                <q-input
-                  filled
-                  class="full-width q-mb-md"
-                  label="Street"
-                  type="text"
-                  v-model="formData.street"
-                >
-                  <template v-slot:prepend>
-                    <q-icon name="place" />
-                  </template>
+                        <q-icon name="title" />
+                      </template>
                 </q-input>
-                <!-- <q-input
-                  filled
-                  class="full-width q-mb-md"
-                  label="Email Address"
-                  type="email"
-                  v-model="formData.email"
-                >
+                  <q-input
+                    v-model="exp.company"
+                    label="Company"
+                    filled
+                    class="q-mb-sm"
+                  >
+
                   <template v-slot:prepend>
-                    <q-icon name="email" />
-                  </template>
-                </q-input> -->
+                        <q-icon name="apartment" />
+                      </template>
+                </q-input>
+                  <q-input
+                    v-model="exp.location"
+                    label="Location"
+                    filled
+                    class="q-mb-sm"
+                  >
+                <template v-slot:prepend>
+                        <q-icon name="location_on" />
+                      </template></q-input>
+                  <q-input
+                    v-model="exp.years"
+                    label="Years"
+                    filled
+                    class="q-mb-sm"
+                  >
+                <template v-slot:prepend>
+                        <q-icon name="numbers" />
+                      </template>
+                </q-input>
+                  <q-btn
+                    color="negative"
+                    icon="delete"
+                    flat
+                    @click="removeExperience(index)"
+                    class="q-mb-lg"
+                    label="Remove Experience"
+                  />
+                </div>
                 <q-btn
                   unelevated
-                  label="Update"
-                  class="text-center full-width"
+                  label="Add Experience"
                   color="primary"
-                  size="md"
-                  type="submit"
+                  flat
+                  icon="add"
+                  class=" q-mb-md"
+                  @click="addExperience"
                 />
-              </div>
-            </div>
+                <q-btn
+                  unelevated
+                  label="Save "
+                  color="primary"
+                  class="full-width"
+                  @click="saveExperiences"
+                />
+              </q-form>
+            </q-card-section>
+          </q-tab-panel>
+        </q-tab-panels>
 
-            <!-- <div class="row align-center">
-              <q-btn
-                unelevated
-                label="Update"
-                class="text-center full-width"
-                color="primary"
-                size="md"
-                type="submit"
-              />
-            </div> -->
-          </q-form>
-        </q-card-section>
+        <q-inner-loading :showing="visible" />
       </q-card>
       <!-- <userList /> -->
 
@@ -303,6 +490,9 @@ const CreateDialogFunc = () => {
   showCreateDialog.value = true;
 };
 
+const tab = ref("profile");
+const visible = ref(true);
+
 const $q = useQuasar();
 
 const showCaptureImg = ref(false);
@@ -328,6 +518,7 @@ const formData = reactive({
   zipcode: null,
   street: null,
   role: null,
+  bio: null,
 });
 
 /**
@@ -350,6 +541,7 @@ const getUserData = async () => {
       formData.dob = response.data.data.dob;
       formData.gender = response.data.data.gender;
       formData.phone = response.data.data.phone;
+      formData.bio = response.data.data.biography;
       // formData.role = response.data.data.roles[0]
       //   ? response.data.data.roles[0].name
       //   : "";
@@ -367,6 +559,15 @@ const getUserData = async () => {
       console.log(error);
     });
 };
+
+// Load biography
+const getBio = () => {
+  visible.value = true
+
+  setTimeout(() => {
+    visible.value = false;
+  },1000)
+}
 
 /**
  *
@@ -487,7 +688,66 @@ const CityfilterFn = (val, update) => {
   });
 };
 
-// Submit or create an account for client and professional doctors
+const onSubmitBio = () => {
+  console.log('bio')
+  var newToken = LocalStorage.getItem("jwt");
+  $q.loading.show();
+  api
+    .patch(
+      "/api/users/biography/update",
+      {
+        bio: formData.bio,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + newToken,
+        },
+      }
+    )
+    .then((response) => {
+      console.log(response);
+      if (response.data.status == 200) {
+        setTimeout(() => {
+          $q.notify({
+            type: "positive",
+            icon: "save",
+            timeout: 3000,
+            position: "top",
+            message: response.data.message,
+          });
+          $q.loading.hide();
+          // userStore.addNewMember(response.data.data);
+          // emit("hideImageDialog");
+        }, 500);
+      } else {
+        setTimeout(() => {
+          $q.loading.hide();
+          $q.notify({
+            type: "negative",
+            icon: "error",
+            timeout: 3000,
+            position: "top",
+            message: response.data.message,
+          });
+        }, 3000);
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      setTimeout(() => {
+        $q.loading.hide();
+        $q.notify({
+          type: "negative",
+          icon: "error",
+          timeout: 3000,
+          position: "top",
+          message: "Error! Please report to software engineer",
+        });
+      }, 5000);
+    });
+}
+
+// Update profile of the user
 const onSubmit = () => {
   var newToken = LocalStorage.getItem("jwt");
   $q.loading.show();
@@ -555,10 +815,192 @@ const onSubmit = () => {
       }, 5000);
     });
 };
+
+
+/**
+ *
+ * Experience functions
+ * */
+// Initial experiences data
+const experiences = reactive([
+  // {
+  //   id:'',
+  //   jobTitle: "",
+  //   company: "",
+  //   years: "",
+  //   location: ''
+  // },
+]);
+
+// Function to add a new experience field
+const addExperience = () => {
+  experiences.push({
+    id:'',
+    jobTitle: "",
+    company: "",
+    years: "",
+    location: "",
+  });
+};
+
+// Function to remove an experience field
+const removeExperience = (index) => {
+  experiences.splice(index, 1);
+};
+
+// Function to save the experiences
+const saveExperiences = async () => {
+
+  let a = 0;
+  experiences.forEach((item, index) => {
+    if (!item.jobTitle) {
+      $q.notify({
+        position: 'top',
+        type: 'negative',
+        timeout: 3000,
+        message: `The Job title is empty in object at index ${index + 1}, Please fill the necessary details!`
+      });
+      a++;
+    }
+  });
+
+  if (a == 0) {
+    var newToken = LocalStorage.getItem("jwt");
+    $q.loading.show();
+    api
+      .post(
+        "/api/users/experience/save",
+        {
+          experiences: experiences,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + newToken,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        if (response.data.status == 200) {
+          setTimeout(() => {
+            $q.notify({
+              type: "positive",
+              icon: "save",
+              timeout: 3000,
+              position: "top",
+              message: response.data.message,
+            });
+            $q.loading.hide();
+            // userStore.addNewMember(response.data.data);
+            // emit("hideImageDialog");
+          }, 500);
+        } else {
+          setTimeout(() => {
+            $q.loading.hide();
+            $q.notify({
+              type: "negative",
+              icon: "error",
+              timeout: 3000,
+              position: "top",
+              message: response.data.message,
+            });
+          }, 3000);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        setTimeout(() => {
+          $q.loading.hide();
+          $q.notify({
+            type: "negative",
+            icon: "error",
+            timeout: 3000,
+            position: "top",
+            message: "Error! Please report to software engineer",
+          });
+        }, 5000);
+      });
+  }
+
+
+}
+
+// Get All user experience
+const getExperiences = async () => {
+  experiences.length = 0;
+  visible.value = true
+  var newToken = LocalStorage.getItem("jwt");
+  // $q.loading.show();
+  await api
+  .get(
+    "/api/users/experience/all",
+    {
+      headers: {
+        Authorization: "Bearer " + newToken,
+      },
+    }
+  )
+  .then((response) => {
+    console.log(response);
+    if (response.data.status == 200) {
+      setTimeout(() => {
+        Object.entries(response.data.data).map(([key, val]) => {
+          experiences.push({
+            id: val.id,
+            jobTitle: val.job_title,
+            company: val.company_name,
+            years: val.years,
+            location: val.location,
+          })
+        });
+        visible.value = false;
+      },1000)
+
+    } else {
+      setTimeout(() => {
+        // $q.loading.hide();
+        $q.notify({
+          type: "negative",
+          icon: "error",
+          timeout: 3000,
+          position: "top",
+          message: response.data.message,
+        });
+      }, 3000);
+    }
+  })
+  .catch((error) => {
+    console.log(error);
+    setTimeout(() => {
+      // $q.loading.hide();
+      $q.notify({
+        type: "negative",
+        icon: "error",
+        timeout: 3000,
+        position: "top",
+        message: "Error! Please report to software engineer",
+      });
+    }, 5000);
+  });
+}
+
+// visible.value = true;
+// // Your API call or logic to save the experiences
+// console.log("Experiences saved:", experiences);
+
+// $q.notify({
+//   type: "positive",
+//   message: "Experiences saved successfully!",
+// });
+
 // load data
 onMounted(() => {
   getUserData();
+  // getExperiences();
   // userStore.getAllUsers();
   countryFunc();
+  setTimeout(() => {
+    visible.value = false;
+  }, 1000);
 });
 </script>

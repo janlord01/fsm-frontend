@@ -82,7 +82,7 @@ const routes = [
       {
         path: "/profile/change-password",
         component: () => import("pages/profile/ChangePasswordPage.vue"),
-        name: "profile",
+        name: "change-password",
         meta: {
           requiredAuth: true,
           access: ["super-admin", "client", "professional"],
@@ -105,6 +105,33 @@ const routes = [
         meta: {
           requiredAuth: true,
           access: ["super-admin"],
+        },
+      },
+    ],
+  },
+  {
+    path: "/question",
+    component: () => import("layouts/AuthLayout.vue"),
+    meta: {
+      requiredAuth: true,
+    },
+    children: [
+      {
+        path: "/question",
+        component: () => import("pages/question/QuestionIndexPage.vue"),
+        name: "question-index",
+        meta: {
+          requiredAuth: true,
+          access: ["super-admin", "client"],
+        },
+      },
+      {
+        path: "/question/create",
+        component: () => import("pages/question/CreateQuestionPage.vue"),
+        name: "question-create",
+        meta: {
+          requiredAuth: true,
+          access: ["super-admin", "client"],
         },
       },
     ],

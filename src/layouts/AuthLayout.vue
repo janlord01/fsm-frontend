@@ -105,9 +105,10 @@
               <q-menu>
                 <div class="row no-wrap q-pa-md">
                   <div class="column">
-                    <div class="q-mb-md" style="font-size: 22px">
-                      Account Settings
+                    <div class="q-mb-md" style="font-size: 18px">
+                      Profile Settings
                     </div>
+
                     <q-list>
                       <!-- <q-item
                         clickable
@@ -307,7 +308,13 @@
               )
             "
           >
-            <q-item v-for="link in links2" :key="link.text" v-ripple clickable>
+            <q-item
+              v-for="link in links2"
+              :key="link.text"
+              :to="link.to"
+              v-ripple
+              clickable
+            >
               <q-item-section avatar>
                 <q-icon color="grey" :name="link.icon" />
               </q-item-section>
@@ -324,11 +331,11 @@
               )
             "
           >
-            <q-separator class="q-mt-md q-mb-xs" />
+            <!-- <q-separator class="q-mt-md q-mb-xs" />
 
             <q-item-label header class="text-weight-bold text-uppercase">
               Doctor's View
-            </q-item-label>
+            </q-item-label> -->
 
             <q-item v-for="link in links3" :key="link.text" v-ripple clickable>
               <q-item-section avatar>
@@ -339,22 +346,32 @@
               </q-item-section>
             </q-item>
           </div>
-          <q-separator class="q-my-md" />
+          <div
+            v-if="
+              userStore.userDetails.roles.some(
+                (permis) => ['super-admin'].indexOf(permis) !== -1
+              )
+            "
+            class="q-mt-auto"
+          >
+            <q-separator class="q-my-md" />
 
-          <q-item v-for="link in links4" :key="link.text" v-ripple clickable>
-            <q-item-section avatar>
-              <q-icon color="grey" :name="link.icon" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ link.text }}</q-item-label>
-            </q-item-section>
-          </q-item>
+            <q-item v-for="link in links4" :key="link.text" v-ripple clickable>
+              <q-item-section avatar>
+                <q-icon color="grey" :name="link.icon" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ link.text }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </div>
 
           <q-separator class="q-mt-md q-mb-lg" />
 
-          <div class="q-px-md text-grey-9">
-            <div class="row items-center q-gutter-x-sm q-gutter-y-xs">
-              <!-- <a
+          <div id="credit" class="q-mt-auto absolute-bottom">
+            <div class="q-px-md text-grey-9">
+              <div class="row items-center q-gutter-x-sm q-gutter-y-xs">
+                <!-- <a
                 v-for="button in buttons1"
                 :key="button.text"
                 class="YL__drawer-footer-link"
@@ -362,22 +379,23 @@
               >
                 {{ button.text }}
               </a> -->
-              <p>
-                All Right Reserved &copy; 2024. Created By:
-                <a href="https://janlordluga.com/">Janlord Luga</a>
-              </p>
+                <p>
+                  All Right Reserved &copy; 2024. Created By:
+                  <a href="https://janlordluga.com/">Janlord Luga</a>
+                </p>
+              </div>
             </div>
-          </div>
-          <div class="q-py-md q-px-md text-grey-9">
-            <div class="row items-center q-gutter-x-sm q-gutter-y-xs">
-              <a
-                v-for="button in buttons2"
-                :key="button.text"
-                class="YL__drawer-footer-link"
-                href="javascript:void(0)"
-              >
-                {{ button.text }}
-              </a>
+            <div class="q-px-md q-pb-md text-grey-9">
+              <div class="row items-center q-gutter-x-sm q-gutter-y-xs">
+                <a
+                  v-for="button in buttons2"
+                  :key="button.text"
+                  class="YL__drawer-footer-link"
+                  href="javascript:void(0)"
+                >
+                  {{ button.text }}
+                </a>
+              </div>
             </div>
           </div>
         </q-list>
@@ -409,7 +427,7 @@ const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 };
 const links1 = reactive([
-  { icon: "home", text: "Dashboard", to: "/dashboard" },
+  { icon: "eva-home", text: "Dashboard", to: "/dashboard" },
   { icon: "groups", text: "Users", to: "/users" },
   { icon: "contact_support", text: "Questions" },
   { icon: "reviews", text: "Score Cards" },
@@ -418,15 +436,22 @@ const links1 = reactive([
 
 const links2 = reactive([
   { icon: "home", text: "Home" },
-  { icon: "question_mark", text: "Ask Question" },
-  { icon: "search", text: "Search Topic" },
-  { icon: "question_mark", text: "Ask Doctor" },
-  { icon: "search", text: "Search Doctor" },
+  {
+    icon: "eva-question-mark-circle",
+    text: "Ask Question",
+    to: "/question/create",
+  },
+  // { icon: "search", text: "Search Topic" },
+  { icon: "fa-solid fa-user-md", text: "Ask Doctor" },
+  // { icon: "search", text: "Search Doctor" },
   { icon: "library_add", text: "New Scorecard" },
 ]);
 const links3 = reactive([
   { icon: "home", text: "Home" },
-  { icon: "question_mark", text: "Questions" },
+  {
+    icon: "eva-question-mark-circle",
+    text: "Questions",
+  },
   { icon: "reviews", text: "Reviews" },
   { icon: "photo", text: "Photos" },
 ]);
@@ -458,6 +483,7 @@ onMounted(() => {
 </script>
 
 <style lang="sass">
+
 .YL
 
   &__toolbar-input-container

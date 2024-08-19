@@ -10,6 +10,7 @@
             class="row q-pa-md shadow flex flex-center justify-center"
             ref="formName"
             @submit="onSubmit"
+            v-if="formData.provider == null"
           >
             <div class="col-4 text-center">
               <q-input
@@ -81,7 +82,14 @@
               />
             </div>
           </q-form>
+          <p v-else>
+            You use google or facebook for login, you can't change your password
+            here.
+          </p>
         </q-card-section>
+        <q-inner-loading :showing="visible" />
+        <!-- <q-spinner-gears size="50px" color="primary" /> -->
+        <!-- </q-inner-loading> -->
       </q-card>
     </div>
   </q-page>
@@ -99,6 +107,8 @@ import { api } from "src/boot/axios";
 import { LocalStorage, useQuasar } from "quasar";
 // User State Management
 const userStore = useUserData();
+
+const visible = ref(true);
 
 const oldpassword = ref("");
 const password = ref("");
@@ -138,6 +148,7 @@ const formData = reactive({
   zipcode: null,
   street: null,
   role: null,
+  provider: "",
 });
 
 /**
@@ -169,6 +180,9 @@ const getUserData = async () => {
       formData.zipcode = response.data.data.zipcode;
       formData.street = response.data.data.street;
 
+      formData.provider = response.data.data.provider;
+
+      console.log(formData.provider);
       // formData.profession = response.data.data.profession;
       // formData.code = response.data.data.code;
       // formData.from = response.data.data.know_beefit;
@@ -303,19 +317,11 @@ const onSubmit = () => {
   $q.loading.show();
   api
     .patch(
-      "/api/users/" + 0,
+      "/api/change/password",
       {
-        name: formData.name,
-        email: formData.email,
-        dob: formData.dob,
-        gender: formData.gender,
-        role: formData.role,
-        phone: formData.phone,
-        country: formData.country,
-        state: formData.state,
-        city: formData.city,
-        street: formData.street,
-        zipcode: formData.zipcode,
+        oldpassword: oldpassword.value,
+        password: password.value,
+        password_confirmation: password_confirmation.value,
       },
       {
         headers: {
@@ -324,7 +330,7 @@ const onSubmit = () => {
       }
     )
     .then((response) => {
-      // console.log(response);
+      console.log(response);
       if (response.data.status == 200) {
         setTimeout(() => {
           $q.notify({
@@ -335,6 +341,9 @@ const onSubmit = () => {
             message: response.data.message,
           });
           $q.loading.hide();
+          oldpassword.value = "";
+          password.value = "";
+          password_confirmation.value = "";
           // userStore.addNewMember(response.data.data);
           // emit("hideImageDialog");
         }, 500);
@@ -370,5 +379,10 @@ onMounted(() => {
   getUserData();
   // userStore.getAllUsers();
   countryFunc();
+  // $q.loading.show();
+  setTimeout(() => {
+    // $q.loading.hide();
+    visible.value = false;
+  }, 1000);
 });
 </script>

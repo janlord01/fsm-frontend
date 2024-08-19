@@ -309,6 +309,7 @@ const getUserData = async () => {
       formData.city = JSON.parse(response.data.data.city);
       formData.zipcode = response.data.data.zipcode;
       formData.street = response.data.data.street;
+      formData.provider = response.data.data.provider;
 
       // formData.profession = response.data.data.profession;
       // formData.code = response.data.data.code;
@@ -530,6 +531,7 @@ const formData = reactive({
   street: null,
   role: null,
   password: null,
+  provider: "",
 });
 </script>
 <style scoped></style>
