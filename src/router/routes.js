@@ -88,6 +88,15 @@ const routes = [
           access: ["super-admin", "client", "professional"],
         },
       },
+      {
+        path: "/profile/map",
+        component: () => import("pages/mapPage.vue"),
+        name: "google-map",
+        meta: {
+          requiredAuth: true,
+          access: ["super-admin", "client", "professional"],
+        },
+      },
     ],
   },
 

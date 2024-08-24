@@ -62,6 +62,7 @@
           <q-tab
             name="locations"
             label="Locations"
+            @click="locationFunc"
             v-if="
               userStore.userDetails.roles.some(
                 (permis) => ['professional'].indexOf(permis) !== -1
@@ -83,6 +84,7 @@
           <q-tab
             name="education"
             label="Education"
+            @click="getEducations"
             v-if="
               userStore.userDetails.roles.some(
                 (permis) => ['professional'].indexOf(permis) !== -1
@@ -90,16 +92,6 @@
             "
           />
           <q-separator vertical />
-          <!-- <q-tab
-            name="language"
-            label="Language"
-            v-if="
-              userStore.userDetails.roles.some(
-                (permis) => ['professional'].indexOf(permis) !== -1
-              )
-            "
-          />
-          <q-separator vertical /> -->
         </q-tabs>
         <q-tab-panels v-model="tab" animated>
           <q-tab-panel name="profile">
@@ -379,47 +371,50 @@
           <q-tab-panel name="experience">
             <q-card-section>
               <q-form class="column q-pa-md shawdow full-width block">
-                <div v-for="(exp, index) in experiences" :key="index" class="q-mb-md">
+                <div
+                  v-for="(exp, index) in experiences"
+                  :key="index"
+                  class="q-mb-md"
+                >
                   <q-input
                     v-model="exp.jobTitle"
                     label="Job Title"
                     filled
                     class="q-mb-sm"
                   >
-                  <template v-slot:prepend>
-                        <q-icon name="title" />
-                      </template>
-                </q-input>
+                    <template v-slot:prepend>
+                      <q-icon name="title" />
+                    </template>
+                  </q-input>
                   <q-input
                     v-model="exp.company"
                     label="Company"
                     filled
                     class="q-mb-sm"
                   >
-
-                  <template v-slot:prepend>
-                        <q-icon name="apartment" />
-                      </template>
-                </q-input>
+                    <template v-slot:prepend>
+                      <q-icon name="apartment" />
+                    </template>
+                  </q-input>
                   <q-input
                     v-model="exp.location"
                     label="Location"
                     filled
                     class="q-mb-sm"
                   >
-                <template v-slot:prepend>
-                        <q-icon name="location_on" />
-                      </template></q-input>
+                    <template v-slot:prepend>
+                      <q-icon name="location_on" /> </template
+                  ></q-input>
                   <q-input
                     v-model="exp.years"
                     label="Years"
                     filled
                     class="q-mb-sm"
                   >
-                <template v-slot:prepend>
-                        <q-icon name="numbers" />
-                      </template>
-                </q-input>
+                    <template v-slot:prepend>
+                      <q-icon name="numbers" />
+                    </template>
+                  </q-input>
                   <q-btn
                     color="negative"
                     icon="delete"
@@ -435,7 +430,7 @@
                   color="primary"
                   flat
                   icon="add"
-                  class=" q-mb-md"
+                  class="q-mb-md"
                   @click="addExperience"
                 />
                 <q-btn
@@ -448,8 +443,170 @@
               </q-form>
             </q-card-section>
           </q-tab-panel>
-        </q-tab-panels>
 
+          <!-- Education Panel -->
+          <q-tab-panel name="education">
+            <q-card-section>
+              <q-form class="column q-pa-md shawdow full-width block">
+                <div
+                  v-for="(edu, index) in educations"
+                  :key="index"
+                  class="q-mb-md"
+                >
+                  <q-input
+                    v-model="edu.institution_name"
+                    label="Institution Name"
+                    filled
+                    class="q-mb-sm"
+                  >
+                    <template v-slot:prepend>
+                      <q-icon name="apartment" />
+                    </template>
+                  </q-input>
+                  <q-input
+                    v-model="edu.degree"
+                    label="Degree"
+                    filled
+                    class="q-mb-sm"
+                  >
+                    <template v-slot:prepend>
+                      <q-icon name="school" />
+                    </template>
+                  </q-input>
+                  <q-input
+                    v-model="edu.location"
+                    label="Location"
+                    filled
+                    class="q-mb-sm"
+                  >
+                    <template v-slot:prepend>
+                      <q-icon name="location_on" /> </template
+                  ></q-input>
+                  <q-input
+                    v-model="edu.years"
+                    label="Years"
+                    filled
+                    class="q-mb-sm"
+                  >
+                    <template v-slot:prepend>
+                      <q-icon name="numbers" />
+                    </template>
+                  </q-input>
+                  <q-btn
+                    color="negative"
+                    icon="delete"
+                    flat
+                    @click="removeEducation(index)"
+                    class="q-mb-lg"
+                    label="Remove Education"
+                  />
+                </div>
+                <q-btn
+                  unelevated
+                  label="Add Education"
+                  color="primary"
+                  flat
+                  icon="add"
+                  class="q-mb-md"
+                  @click="addEducation"
+                />
+                <q-btn
+                  unelevated
+                  label="Save "
+                  color="primary"
+                  class="full-width"
+                  @click="saveEducations"
+                />
+              </q-form>
+            </q-card-section>
+          </q-tab-panel>
+
+          <q-tab-panel name="locations">
+            <q-card-section>
+              <q-form class="column q-pa-md shawdow full-width block">
+                <q-toolbar>
+                  <q-toolbar-title></q-toolbar-title>
+                  <q-btn
+                    color="red-5"
+                    label="Search Clinic in Google Map"
+                    to="/profile/map"
+                    icon="search"
+                  />
+                </q-toolbar>
+                <q-select
+                  filled
+                  v-model="locationSelected"
+                  use-input
+                  input-debounce="0"
+                  label="Search Clinic"
+                  :options="Locationoptions"
+                  @filter="filterFn"
+                  class="full-width"
+                  behavior="menu"
+                  @update:model-value="selectedLocFunc"
+                >
+                  <template v-slot:no-option>
+                    <q-item>
+                      <q-item-section class="text-grey">
+                        No results
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-select>
+                <q-btn
+                  unelevated
+                  label="Add"
+                  color="primary"
+                  class="full-width"
+                  @click="AddLocation"
+                />
+                <q-table
+                  flat
+                  :pagination="pagination"
+                  class="q-pa-sm"
+                  :rows="clinicStore.doctorRowDatas"
+                  :loading="clinicStore.loading"
+                  :columns="columns"
+                  row-key="id"
+                  separator="none"
+                  :visible-columns="['name', 'address', 'action']"
+                >
+                  <template v-slot:loading>
+                    <q-inner-loading showing color="primary" />
+                  </template>
+                  <template #body="props">
+                    <q-tr :props="props">
+                      <q-td key="id" :props="props">
+                        {{ props.row.id }}
+                      </q-td>
+
+                      <q-td key="name" :props="props">
+                        {{ props.row.name }}
+                      </q-td>
+                      <q-td key="address" :props="props">
+                        {{ props.row.address }}
+                      </q-td>
+                      <q-td key="action" :props="props">
+                        <q-btn
+                          color="blue"
+                          icon="edit"
+                          size="sm"
+                          label="edit"
+                        />
+                        <q-btn
+                          color="negative"
+                          icon="delete"
+                          label="remove"
+                          size="sm"
+                        />
+                      </q-td>
+                    </q-tr>
+                  </template>
+                </q-table>
+              </q-form>
+            </q-card-section>
+          </q-tab-panel>
+        </q-tab-panels>
         <q-inner-loading :showing="visible" />
       </q-card>
       <!-- <userList /> -->
@@ -462,11 +619,12 @@
     </div>
   </q-page>
 
-  <q-dialog v-model="showCaptureImg" persistent>
-    <ChangeImage
-      :user-id="userId"
-      @hide-image-dialog="showCaptureImg = !showCaptureImg"
-    />
+  <q-dialog
+    v-model="googleMapDialog"
+    persistent
+    style="overflow: visible; z-index: 10000"
+  >
+    <searchGoogleMap @hide-image-dialog="googleMapDialog = !googleMapDialog" />
   </q-dialog>
 </template>
 
@@ -476,10 +634,11 @@ import { ref, reactive, onMounted } from "vue";
 import { useUserData } from "src/stores/users/userStore";
 import CreateUser from "components/users/CreateUser.vue";
 
-import ChangeImage from "components/users/ChangeImage.vue";
+import searchGoogleMap from "components/clinic/AddClinicMap.vue";
 import { Country, State, City } from "country-state-city";
 import { api } from "src/boot/axios";
 import { LocalStorage, useQuasar } from "quasar";
+import { useClinicData } from "src/stores/clinic/clinicStore";
 // User State Management
 const userStore = useUserData();
 
@@ -497,6 +656,156 @@ const $q = useQuasar();
 
 const showCaptureImg = ref(false);
 const userId = ref("");
+
+/**
+ *
+ * Location Functions and variables,datas
+ *
+ */
+const clinicStore = useClinicData();
+
+const LocationStringOptions = ref("");
+const Locationoptions = ref("");
+const locationSelected = ref("");
+
+const pagination = reactive({
+  sortBy: "id",
+  rowsPerPage: 10,
+});
+const columns = reactive([
+  {
+    name: "id",
+    label: "ID",
+    field: "id",
+    align: "left",
+    sortable: true,
+    classes: "bg-grey-4",
+  },
+  {
+    name: "name",
+    label: "Name",
+    field: "name",
+    align: "left",
+    sortable: true,
+  },
+
+  {
+    name: "address",
+    label: "address",
+    field: "address",
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "number",
+    label: "Number",
+    field: "number",
+    align: "left",
+    sortable: true,
+  },
+  {
+    name: "action",
+    label: "Action",
+    field: "action",
+    align: "left",
+  },
+]);
+
+const selectedLocFunc = () => {
+  console.log(locationSelected.value);
+};
+
+const locationFunc = () => {
+  visible.value = true;
+  clinicStore.getAllClinics();
+  clinicStore.getDoctorClinics();
+  setTimeout(() => {
+    // LocationStringOptions.value = clinicStore.rowDatas;
+    // Locationoptions.value = LocationStringOptions.value;
+    // console.log(clinicStore.rowDatas);
+    visible.value = false;
+  }, 500);
+};
+
+const filterFn = (val, update) => {
+  if (val === "") {
+    update(() => {
+      Locationoptions.value = clinicStore.rowDatas;
+    });
+    return;
+  }
+
+  update(() => {
+    const needle = val.toLowerCase();
+    Locationoptions.value = clinicStore.rowDatas.filter(
+      (v) => v.label.toLowerCase().indexOf(needle) > -1
+    );
+  });
+};
+
+const AddLocation = () => {
+  visible.value = true;
+  api
+    .post(
+      "/api/clinic/doctors",
+      {
+        id: locationSelected.value.value,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + newToken.value,
+        },
+      }
+    )
+    .then((response) => {
+      console.log(response);
+
+      if (response.data.status == 200) {
+        setTimeout(() => {
+          $q.notify({
+            type: "positive",
+            position: "top",
+            message: response.data.message,
+            timeout: 3000,
+          });
+          clinicStore.getDoctorClinics();
+          visible.value = false;
+        }, 500);
+      } else {
+        setTimeout(() => {
+          $q.notify({
+            type: "negative",
+            position: "top",
+            message: response.data.message,
+            timeout: 3000,
+          });
+          visible.value = false;
+        }, 3000);
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      setTimeout(() => {
+        $q.notify({
+          type: "negative",
+          position: "top",
+          message: "Something went wrong, kindly contact the support!",
+          timeout: 3000,
+        });
+        visible.value = false;
+      }, 3000);
+    });
+};
+
+/**
+ * Google map search properties
+ */
+
+const googleMapDialog = ref(false);
+// Google map pop up functions
+const searchClinicFunc = () => {
+  googleMapDialog.value = true;
+};
 
 const changeImageDialog = (id) => {
   showCaptureImg.value = true;
@@ -562,12 +871,12 @@ const getUserData = async () => {
 
 // Load biography
 const getBio = () => {
-  visible.value = true
+  visible.value = true;
 
   setTimeout(() => {
     visible.value = false;
-  },1000)
-}
+  }, 1000);
+};
 
 /**
  *
@@ -689,7 +998,7 @@ const CityfilterFn = (val, update) => {
 };
 
 const onSubmitBio = () => {
-  console.log('bio')
+  console.log("bio");
   var newToken = LocalStorage.getItem("jwt");
   $q.loading.show();
   api
@@ -745,7 +1054,7 @@ const onSubmitBio = () => {
         });
       }, 5000);
     });
-}
+};
 
 // Update profile of the user
 const onSubmit = () => {
@@ -816,7 +1125,6 @@ const onSubmit = () => {
     });
 };
 
-
 /**
  *
  * Experience functions
@@ -835,7 +1143,7 @@ const experiences = reactive([
 // Function to add a new experience field
 const addExperience = () => {
   experiences.push({
-    id:'',
+    id: "",
     jobTitle: "",
     company: "",
     years: "",
@@ -850,15 +1158,16 @@ const removeExperience = (index) => {
 
 // Function to save the experiences
 const saveExperiences = async () => {
-
   let a = 0;
   experiences.forEach((item, index) => {
     if (!item.jobTitle) {
       $q.notify({
-        position: 'top',
-        type: 'negative',
+        position: "top",
+        type: "negative",
         timeout: 3000,
-        message: `The Job title is empty in object at index ${index + 1}, Please fill the necessary details!`
+        message: `The Job title is empty in object at index ${
+          index + 1
+        }, Please fill the necessary details!`,
       });
       a++;
     }
@@ -921,42 +1230,50 @@ const saveExperiences = async () => {
         }, 5000);
       });
   }
-
-
-}
+};
 
 // Get All user experience
 const getExperiences = async () => {
   experiences.length = 0;
-  visible.value = true
+  visible.value = true;
   var newToken = LocalStorage.getItem("jwt");
   // $q.loading.show();
   await api
-  .get(
-    "/api/users/experience/all",
-    {
+    .get("/api/users/experience/all", {
       headers: {
         Authorization: "Bearer " + newToken,
       },
-    }
-  )
-  .then((response) => {
-    console.log(response);
-    if (response.data.status == 200) {
-      setTimeout(() => {
-        Object.entries(response.data.data).map(([key, val]) => {
-          experiences.push({
-            id: val.id,
-            jobTitle: val.job_title,
-            company: val.company_name,
-            years: val.years,
-            location: val.location,
-          })
-        });
-        visible.value = false;
-      },1000)
-
-    } else {
+    })
+    .then((response) => {
+      console.log(response);
+      if (response.data.status == 200) {
+        setTimeout(() => {
+          Object.entries(response.data.data).map(([key, val]) => {
+            experiences.push({
+              id: val.id,
+              jobTitle: val.job_title,
+              company: val.company_name,
+              years: val.years,
+              location: val.location,
+            });
+          });
+          visible.value = false;
+        }, 1000);
+      } else {
+        setTimeout(() => {
+          // $q.loading.hide();
+          $q.notify({
+            type: "negative",
+            icon: "error",
+            timeout: 3000,
+            position: "top",
+            message: response.data.message,
+          });
+        }, 3000);
+      }
+    })
+    .catch((error) => {
+      console.log(error);
       setTimeout(() => {
         // $q.loading.hide();
         $q.notify({
@@ -964,34 +1281,173 @@ const getExperiences = async () => {
           icon: "error",
           timeout: 3000,
           position: "top",
-          message: response.data.message,
+          message: "Error! Please report to software engineer",
         });
-      }, 3000);
-    }
-  })
-  .catch((error) => {
-    console.log(error);
-    setTimeout(() => {
-      // $q.loading.hide();
-      $q.notify({
-        type: "negative",
-        icon: "error",
-        timeout: 3000,
-        position: "top",
-        message: "Error! Please report to software engineer",
-      });
-    }, 5000);
+      }, 5000);
+    });
+};
+
+/**
+ *
+ * Experience functions
+ * */
+// Initial experiences data
+const educations = reactive([
+  // {
+  //   id:'',
+  //   jobTitle: "",
+  //   company: "",
+  //   years: "",
+  //   location: ''
+  // },
+]);
+
+// Function to add a new Education field
+const addEducation = () => {
+  educations.push({
+    id: "",
+    institution_name: "",
+    degree: "",
+    years: "",
+    location: "",
   });
-}
+};
 
-// visible.value = true;
-// // Your API call or logic to save the experiences
-// console.log("Experiences saved:", experiences);
+// Function to remove an Education field
+const removeEducation = (index) => {
+  educations.splice(index, 1);
+};
 
-// $q.notify({
-//   type: "positive",
-//   message: "Experiences saved successfully!",
-// });
+// Function to save the Educations
+const saveEducations = async () => {
+  let a = 0;
+  educations.forEach((item, index) => {
+    if (!item.institution_name) {
+      $q.notify({
+        position: "top",
+        type: "negative",
+        timeout: 3000,
+        message: `The Institution Name is empty in object at index ${
+          index + 1
+        }, Please fill the necessary details!`,
+      });
+      a++;
+    }
+  });
+
+  if (a == 0) {
+    var newToken = LocalStorage.getItem("jwt");
+    $q.loading.show();
+    api
+      .post(
+        "/api/users/education/save",
+        {
+          educations: educations,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + newToken,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        if (response.data.status == 200) {
+          setTimeout(() => {
+            $q.notify({
+              type: "positive",
+              icon: "save",
+              timeout: 3000,
+              position: "top",
+              message: response.data.message,
+            });
+            $q.loading.hide();
+            // userStore.addNewMember(response.data.data);
+            // emit("hideImageDialog");
+          }, 500);
+        } else {
+          setTimeout(() => {
+            $q.loading.hide();
+            $q.notify({
+              type: "negative",
+              icon: "error",
+              timeout: 3000,
+              position: "top",
+              message: response.data.message,
+            });
+          }, 3000);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        setTimeout(() => {
+          $q.loading.hide();
+          $q.notify({
+            type: "negative",
+            icon: "error",
+            timeout: 3000,
+            position: "top",
+            message: "Error! Please report to software engineer",
+          });
+        }, 5000);
+      });
+  }
+};
+
+// Get All user experience
+const getEducations = async () => {
+  educations.length = 0;
+  visible.value = true;
+  var newToken = LocalStorage.getItem("jwt");
+  // $q.loading.show();
+  await api
+    .get("/api/users/education/all", {
+      headers: {
+        Authorization: "Bearer " + newToken,
+      },
+    })
+    .then((response) => {
+      console.log(response);
+      if (response.data.status == 200) {
+        setTimeout(() => {
+          Object.entries(response.data.data).map(([key, val]) => {
+            educations.push({
+              id: val.id,
+              institution_name: val.institution_name,
+              degree: val.degree,
+              years: val.years,
+              location: val.location,
+            });
+          });
+          visible.value = false;
+        }, 1000);
+      } else {
+        setTimeout(() => {
+          // $q.loading.hide();
+          $q.notify({
+            type: "negative",
+            icon: "error",
+            timeout: 3000,
+            position: "top",
+            message: response.data.message,
+          });
+        }, 3000);
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      setTimeout(() => {
+        // $q.loading.hide();
+        $q.notify({
+          type: "negative",
+          icon: "error",
+          timeout: 3000,
+          position: "top",
+          message: "Error! Please report to software engineer",
+        });
+      }, 5000);
+    });
+};
 
 // load data
 onMounted(() => {
